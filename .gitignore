@@ -56,5 +56,5 @@ next-env.d.ts
 .turbo
 
 # tailwind
-tailwind.config.ts
-postcss.config.js
+# tailwind.config.ts
+# postcss.config.js
