@@ -29,15 +29,18 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Redirect to login if not authenticated and accessing protected routes
-  if (!user && !request.nextUrl.pathname.startsWith('/auth')) {
+  const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
+  const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
+
+  // Not logged in → trying to access dashboard → redirect to login
+  if (!user && isDashboard) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
 
-  // Redirect to dashboard if authenticated and accessing auth pages
-  if (user && request.nextUrl.pathname.startsWith('/auth')) {
+  // Logged in → trying to access auth pages → redirect to dashboard
+  if (user && isAuthPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
     return NextResponse.redirect(url)
@@ -47,7 +50,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
-  ],
+  matcher: ['/dashboard/:path*', '/auth/:path*'],
 }
